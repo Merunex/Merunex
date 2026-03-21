@@ -1,16 +1,37 @@
-## Hi there 👋
+# Merunex
 
-<!--
-**Merunex/Merunex** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
+Full-stack developer focused on backend systems, databases, AI integrations, and practical software architecture.
 
-Here are some ideas to get you started:
+I build web platforms, Telegram bots, local AI workflows, and educational IT projects.
 
-- 🔭 I’m currently working on ...
-- 🌱 I’m currently learning ...
-- 👯 I’m looking to collaborate on ...
-- 🤔 I’m looking for help with ...
-- 💬 Ask me about ...
-- 📫 How to reach me: ...
-- 😄 Pronouns: ...
-- ⚡ Fun fact: ...
--->
+## What I work with
+
+- PHP
+- Python
+- JavaScript
+- MySQL
+- Git and GitHub
+
+## Current focus
+
+- AI-powered Telegram bots
+- Database-driven web applications
+- Local LLM integrations
+- System architecture
+- Educational IT materials
+
+## Selected areas
+
+- Backend development
+- Database design
+- Automation
+- AI tooling
+- Technical education
+
+## Notes
+
+I prefer practical systems: clear structure, maintainable logic, and solutions that work in real conditions.
+
+## Contact
+
+GitHub: [Merunex](https://github.com/Merunex)

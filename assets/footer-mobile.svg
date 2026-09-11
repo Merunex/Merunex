@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="146" viewBox="0 0 640 146"><defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#141524"/><stop offset=".57" stop-color="#10111d"/><stop offset="1" stop-color="#172132"/></linearGradient>
+  <linearGradient id="edge" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#b6a4ff"/><stop offset=".5" stop-color="#7976df"/><stop offset="1" stop-color="#7adac9"/></linearGradient>
+  <linearGradient id="tile" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#7773ca" stop-opacity=".5"/><stop offset="1" stop-color="#2b324b" stop-opacity=".85"/></linearGradient>
+  <linearGradient id="slab" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#41426a"/><stop offset="1" stop-color="#20293c"/></linearGradient>
+  <radialGradient id="halo"><stop stop-color="#9080f4" stop-opacity=".18"/><stop offset="1" stop-color="#9080f4" stop-opacity="0"/></radialGradient>
+  <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M32 0H0V32" fill="none" stroke="#a9a3e8" stroke-opacity=".045"/></pattern>
+</defs><rect width="640" height="146" rx="18" fill="url(#bg)"/><path d="M30 32V114" stroke="url(#edge)" stroke-width="3"/><text x="54" y="67" fill="#d4cfee" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="500">Thoughtful architecture.</text><text x="54" y="106" fill="#d4cfee" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="500">Practical software.</text></svg>

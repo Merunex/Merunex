@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="96" viewBox="0 0 1200 96"><defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#141524"/><stop offset=".57" stop-color="#10111d"/><stop offset="1" stop-color="#172132"/></linearGradient>
+  <linearGradient id="edge" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#b6a4ff"/><stop offset=".5" stop-color="#7976df"/><stop offset="1" stop-color="#7adac9"/></linearGradient>
+  <linearGradient id="tile" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#7773ca" stop-opacity=".5"/><stop offset="1" stop-color="#2b324b" stop-opacity=".85"/></linearGradient>
+  <linearGradient id="slab" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#41426a"/><stop offset="1" stop-color="#20293c"/></linearGradient>
+  <radialGradient id="halo"><stop stop-color="#9080f4" stop-opacity=".18"/><stop offset="1" stop-color="#9080f4" stop-opacity="0"/></radialGradient>
+  <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M32 0H0V32" fill="none" stroke="#a9a3e8" stroke-opacity=".045"/></pattern>
+</defs><rect width="1200" height="96" rx="16" fill="url(#bg)"/><path d="M30 30V66" stroke="url(#edge)" stroke-width="3"/><text x="54" y="57" fill="#d4cfee" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="500">Thoughtful architecture. Practical software.</text><text x="998" y="56" fill="#a69cbf" font-family="Courier New, monospace" font-size="14" font-weight="400" letter-spacing="2">MERUNEX /</text></svg>

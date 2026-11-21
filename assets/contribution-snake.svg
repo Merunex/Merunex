@@ -380,7 +380,7 @@
 <rect x="744.5" y="72.5" width="11" height="11" rx="2.6" fill="#272937"/>
 <rect x="744.5" y="86.5" width="11" height="11" rx="2.6" fill="#272937"/>
 <rect x="744.5" y="100.5" width="11" height="11" rx="2.6" fill="#272937"/>
-<rect x="744.5" y="114.5" width="11" height="11" rx="2.6" fill="#6eb698"/>
+<rect x="744.5" y="114.5" width="11" height="11" rx="2.6" fill="#a4efc7"/>
 <g class="food" transform="translate(316 64)" opacity="0">
   <rect x="-5" y="-5" width="10" height="10" fill="#beff68"/>
   <rect x="-3" y="-3" width="3" height="3" fill="#f2ffd0"/>

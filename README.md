@@ -49,7 +49,10 @@ I’m exploring how locally run language models fit into apps and bots, especial
 
 ## Contribution snake
 
-<img src="./assets/contribution-snake.svg" alt="Animated GitHub contribution calendar for the last year" width="100%">
+<picture>
+  <source media="(prefers-reduced-motion: reduce)" srcset="./assets/contribution-calendar.svg">
+  <img src="./assets/contribution-snake.svg" alt="GitHub contribution calendar for the last year. Gold cells mark successful public GitHub deployment days." width="100%">
+</picture>
 
 Gold squares mark successful public GitHub deployments. The snake eats them as it passes.
 

@@ -93,7 +93,7 @@ def route_cells(weeks, last_row):
     return route
 
 
-def draw_calendar(days, deployments):
+def draw_calendar(days, deployments, animated=True):
     first_day, last_day = min(days), max(days)
     sunday = first_day - timedelta(days=(first_day.weekday() + 1) % 7)
     grid = {day: divmod((day - sunday).days, 7) for day in days}
@@ -110,42 +110,58 @@ def draw_calendar(days, deployments):
     width = center(last_week, 0)[0] + 22
     deploy_count = len(deployments)
     deploy_label = f"{deploy_count} deploy {'day' if deploy_count == 1 else 'days'}"
+    route_definition = f'<path id="route" d="M{coords}"/>' if animated else ""
     parts = [f'''<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="155" viewBox="0 0 {width} 155" role="img" aria-labelledby="title description">
 <title id="title">Contribution snake</title>
 <desc id="description">Public GitHub contributions from {first_day} to {last_day}. The snake eats gold cells on successful deployment days. {deploy_label}.</desc>
-<style>
-  text {{ font: 11px system-ui, sans-serif; fill: #c4c4d1; }}
-  .food-still {{ display: none; }}
-  @media (prefers-reduced-motion: reduce) {{
-    .snake, .food-moving {{ display: none; }}
-    .food-still {{ display: inline; }}
-  }}
-</style>
+<style>text {{ font: 11px system-ui, sans-serif; fill: #c4c4d1; }}</style>
 <rect x="0.5" y="0.5" width="{width - 1}" height="154" rx="12" fill="#141622" stroke="#313347"/>
 <defs>
   <g id="food">
     <rect x="-5.5" y="-5.5" width="11" height="11" rx="2.6" fill="{GOLD}"/>
     <path d="M0 -3 3 0 0 3 -3 0Z" fill="#795121"/>
   </g>
-  <path id="route" d="M{coords}"/>
+  {route_definition}
 </defs>''']
 
-    last_label_week = -4
+    label_days = sorted(day for day in days if day.day == 1)
+    if grid[label_days[0]][0] >= 2:
+        label_days.insert(0, first_day)
+    for day in label_days:
+        x, _ = center(*grid[day])
+        parts.append(f'<text x="{x - 5}" y="20">{calendar.month_abbr[day.month]}</text>')
+
     for day, level in sorted(days.items()):
         week, row = grid[day]
         x, y = center(week, row)
-        if (day == first_day or day.day == 1) and week - last_label_week >= 3:
-            parts.append(f'<text x="{x - 5}" y="20">{calendar.month_abbr[day.month]}</text>')
-            last_label_week = week
         color = COLORS[0 if day in deployments else level]
         parts.append(f'<rect x="{x - 5.5}" y="{y - 5.5}" width="11" height="11" rx="2.6" fill="{color}"/>')
         if day in deployments:
-            bite = arrival[(week, row)]
-            parts.append(f'''<use class="food-still" href="#food" x="{x}" y="{y}"/>
-<use class="food-moving" href="#food" x="{x}" y="{y}">
-  <animate attributeName="opacity" values="1;1;0;0" keyTimes="0;{bite / duration:.6f};{(bite + 0.16) / duration:.6f};1" dur="{duration:.3f}s" repeatCount="indefinite"/>
-</use>''')
+            parts.append(deployment_tile(x, y, arrival[(week, row)], duration, animated))
 
+    if animated:
+        parts.extend(draw_snake(travel, duration))
+    parts.append(f'''<path d="M16 128H{width - 16}" stroke="#303244"/>
+<rect x="16" y="137" width="9" height="9" rx="2" fill="{COLORS[3]}"/>
+<text x="31" y="145">Contributions</text>
+<use href="#food" x="132" y="141.5"/>
+<text x="144" y="145">{deploy_label}</text>
+</svg>''')
+    return "\n".join(parts) + "\n"
+
+
+def deployment_tile(x, y, bite, duration, animated):
+    tile = f'<use class="deployment-day" href="#food" x="{x}" y="{y}"'
+    if not animated:
+        return tile + "/>"
+    eaten = (bite + 0.16) / duration
+    return tile + f'''>
+  <animate attributeName="opacity" values="1;1;0;0" keyTimes="0;{bite / duration:.6f};{eaten:.6f};1"
+    dur="{duration:.3f}s" repeatCount="indefinite"/>
+</use>'''
+
+
+def draw_snake(travel, duration):
     def motion(delay, rotate="0"):
         start = (START_SECONDS + delay) / duration
         end = (START_SECONDS + delay + travel) / duration
@@ -153,7 +169,7 @@ def draw_calendar(days, deployments):
   <mpath href="#route"/>
 </animateMotion>'''
 
-    parts.append('<g class="snake">')
+    parts = ['<g class="snake">']
     for index, color in enumerate(TAIL):
         delay = (len(TAIL) - index) * TAIL_LINK_SECONDS
         parts.append(f'<circle r="{3 + index * 0.39:.2f}" fill="{color}">{motion(delay)}</circle>')
@@ -164,14 +180,8 @@ def draw_calendar(days, deployments):
   <circle cx="2.2" cy="2.3" r="1.15" fill="#1d1830"/>
   {motion(0, "auto")}
 </g>
-</g>
-<path d="M16 128H{width - 16}" stroke="#303244"/>
-<rect x="16" y="137" width="9" height="9" rx="2" fill="{COLORS[3]}"/>
-<text x="31" y="145">Contributions</text>
-<use href="#food" x="132" y="141.5"/>
-<text x="144" y="145">{deploy_label}</text>
-</svg>''')
-    return "\n".join(parts) + "\n"
+</g>''')
+    return parts
 
 
 def main():
@@ -180,8 +190,11 @@ def main():
     args = parser.parse_args()
     days = contribution_days(args.owner)
     deployments = successful_deploy_days(args.owner, min(days), max(days))
-    output = Path(__file__).resolve().parents[1] / "assets" / "contribution-snake.svg"
-    output.write_text(draw_calendar(days, deployments), encoding="utf-8")
+    assets = Path(__file__).resolve().parents[1] / "assets"
+    (assets / "contribution-snake.svg").write_text(draw_calendar(days, deployments), encoding="utf-8")
+    (assets / "contribution-calendar.svg").write_text(
+        draw_calendar(days, deployments, animated=False), encoding="utf-8"
+    )
     print(f"Rendered {len(days)} public calendar days and {len(deployments)} successful deployment days")
 
 

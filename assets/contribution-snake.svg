@@ -1,14 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="772" height="155" viewBox="0 0 772 155" role="img" aria-labelledby="title description">
 <title id="title">Contribution snake</title>
 <desc id="description">Public GitHub contributions from 2025-11-22 to 2026-11-21. The snake eats gold cells on successful deployment days. 0 deploy days.</desc>
-<style>
-  text { font: 11px system-ui, sans-serif; fill: #c4c4d1; }
-  .food-still { display: none; }
-  @media (prefers-reduced-motion: reduce) {
-    .snake, .food-moving { display: none; }
-    .food-still { display: inline; }
-  }
-</style>
+<style>text { font: 11px system-ui, sans-serif; fill: #c4c4d1; }</style>
 <rect x="0.5" y="0.5" width="771" height="154" rx="12" fill="#141622" stroke="#313347"/>
 <defs>
   <g id="food">
@@ -18,6 +11,18 @@
   <path id="route" d="M750,120 L750,106 L750,92 L750,78 L750,64 L750,50 L750,36 L736,36 L736,50 L736,64 L736,78 L736,92 L736,106 L736,120 L722,120 L722,106 L722,92 L722,78 L722,64 L722,50 L722,36 L708,36 L708,50 L708,64 L708,78 L708,92 L708,106 L708,120 L694,120 L694,106 L694,92 L694,78 L694,64 L694,50 L694,36 L680,36 L680,50 L680,64 L680,78 L680,92 L680,106 L680,120 L666,120 L666,106 L666,92 L666,78 L666,64 L666,50 L666,36 L652,36 L652,50 L652,64 L652,78 L652,92 L652,106 L652,120 L638,120 L638,106 L638,92 L638,78 L638,64 L638,50 L638,36 L624,36 L624,50 L624,64 L624,78 L624,92 L624,106 L624,120 L610,120 L610,106 L610,92 L610,78 L610,64 L610,50 L610,36 L596,36 L596,50 L596,64 L596,78 L596,92 L596,106 L596,120 L582,120 L582,106 L582,92 L582,78 L582,64 L582,50 L582,36 L568,36 L568,50 L568,64 L568,78 L568,92 L568,106 L568,120 L554,120 L554,106 L554,92 L554,78 L554,64 L554,50 L554,36 L540,36 L540,50 L540,64 L540,78 L540,92 L540,106 L540,120 L526,120 L526,106 L526,92 L526,78 L526,64 L526,50 L526,36 L512,36 L512,50 L512,64 L512,78 L512,92 L512,106 L512,120 L498,120 L498,106 L498,92 L498,78 L498,64 L498,50 L498,36 L484,36 L484,50 L484,64 L484,78 L484,92 L484,106 L484,120 L470,120 L470,106 L470,92 L470,78 L470,64 L470,50 L470,36 L456,36 L456,50 L456,64 L456,78 L456,92 L456,106 L456,120 L442,120 L442,106 L442,92 L442,78 L442,64 L442,50 L442,36 L428,36 L428,50 L428,64 L428,78 L428,92 L428,106 L428,120 L414,120 L414,106 L414,92 L414,78 L414,64 L414,50 L414,36 L400,36 L400,50 L400,64 L400,78 L400,92 L400,106 L400,120 L386,120 L386,106 L386,92 L386,78 L386,64 L386,50 L386,36 L372,36 L372,50 L372,64 L372,78 L372,92 L372,106 L372,120 L358,120 L358,106 L358,92 L358,78 L358,64 L358,50 L358,36 L344,36 L344,50 L344,64 L344,78 L344,92 L344,106 L344,120 L330,120 L330,106 L330,92 L330,78 L330,64 L330,50 L330,36 L316,36 L316,50 L316,64 L316,78 L316,92 L316,106 L316,120 L302,120 L302,106 L302,92 L302,78 L302,64 L302,50 L302,36 L288,36 L288,50 L288,64 L288,78 L288,92 L288,106 L288,120 L274,120 L274,106 L274,92 L274,78 L274,64 L274,50 L274,36 L260,36 L260,50 L260,64 L260,78 L260,92 L260,106 L260,120 L246,120 L246,106 L246,92 L246,78 L246,64 L246,50 L246,36 L232,36 L232,50 L232,64 L232,78 L232,92 L232,106 L232,120 L218,120 L218,106 L218,92 L218,78 L218,64 L218,50 L218,36 L204,36 L204,50 L204,64 L204,78 L204,92 L204,106 L204,120 L190,120 L190,106 L190,92 L190,78 L190,64 L190,50 L190,36 L176,36 L176,50 L176,64 L176,78 L176,92 L176,106 L176,120 L162,120 L162,106 L162,92 L162,78 L162,64 L162,50 L162,36 L148,36 L148,50 L148,64 L148,78 L148,92 L148,106 L148,120 L134,120 L134,106 L134,92 L134,78 L134,64 L134,50 L134,36 L120,36 L120,50 L120,64 L120,78 L120,92 L120,106 L120,120 L106,120 L106,106 L106,92 L106,78 L106,64 L106,50 L106,36 L92,36 L92,50 L92,64 L92,78 L92,92 L92,106 L92,120 L78,120 L78,106 L78,92 L78,78 L78,64 L78,50 L78,36 L64,36 L64,50 L64,64 L64,78 L64,92 L64,106 L64,120 L50,120 L50,106 L50,92 L50,78 L50,64 L50,50 L50,36 L36,36 L36,50 L36,64 L36,78 L36,92 L36,106 L36,120 L22,120 L22,106 L22,92 L22,78 L22,64 L22,50 L22,36"/>
 </defs>
 <text x="17" y="20">Nov</text>
+<text x="45" y="20">Dec</text>
+<text x="101" y="20">Jan</text>
+<text x="171" y="20">Feb</text>
+<text x="227" y="20">Mar</text>
+<text x="283" y="20">Apr</text>
+<text x="339" y="20">May</text>
+<text x="409" y="20">Jun</text>
+<text x="465" y="20">Jul</text>
+<text x="521" y="20">Aug</text>
+<text x="591" y="20">Sep</text>
+<text x="647" y="20">Oct</text>
+<text x="717" y="20">Nov</text>
 <rect x="16.5" y="114.5" width="11" height="11" rx="2.6" fill="#272937"/>
 <rect x="30.5" y="30.5" width="11" height="11" rx="2.6" fill="#272937"/>
 <rect x="30.5" y="44.5" width="11" height="11" rx="2.6" fill="#272937"/>
@@ -58,7 +63,6 @@
 <rect x="100.5" y="44.5" width="11" height="11" rx="2.6" fill="#272937"/>
 <rect x="100.5" y="58.5" width="11" height="11" rx="2.6" fill="#272937"/>
 <rect x="100.5" y="72.5" width="11" height="11" rx="2.6" fill="#272937"/>
-<text x="101" y="20">Jan</text>
 <rect x="100.5" y="86.5" width="11" height="11" rx="2.6" fill="#272937"/>
 <rect x="100.5" y="100.5" width="11" height="11" rx="2.6" fill="#272937"/>
 <rect x="100.5" y="114.5" width="11" height="11" rx="2.6" fill="#272937"/>
@@ -90,7 +94,6 @@
 <rect x="156.5" y="86.5" width="11" height="11" rx="2.6" fill="#272937"/>
 <rect x="156.5" y="100.5" width="11" height="11" rx="2.6" fill="#272937"/>
 <rect x="156.5" y="114.5" width="11" height="11" rx="2.6" fill="#272937"/>
-<text x="171" y="20">Feb</text>
 <rect x="170.5" y="30.5" width="11" height="11" rx="2.6" fill="#272937"/>
 <rect x="170.5" y="44.5" width="11" height="11" rx="2.6" fill="#272937"/>
 <rect x="170.5" y="58.5" width="11" height="11" rx="2.6" fill="#272937"/>
@@ -119,7 +122,6 @@
 <rect x="212.5" y="86.5" width="11" height="11" rx="2.6" fill="#272937"/>
 <rect x="212.5" y="100.5" width="11" height="11" rx="2.6" fill="#272937"/>
 <rect x="212.5" y="114.5" width="11" height="11" rx="2.6" fill="#272937"/>
-<text x="227" y="20">Mar</text>
 <rect x="226.5" y="30.5" width="11" height="11" rx="2.6" fill="#272937"/>
 <rect x="226.5" y="44.5" width="11" height="11" rx="2.6" fill="#272937"/>
 <rect x="226.5" y="58.5" width="11" height="11" rx="2.6" fill="#272937"/>
@@ -151,7 +153,6 @@
 <rect x="282.5" y="30.5" width="11" height="11" rx="2.6" fill="#272937"/>
 <rect x="282.5" y="44.5" width="11" height="11" rx="2.6" fill="#272937"/>
 <rect x="282.5" y="58.5" width="11" height="11" rx="2.6" fill="#272937"/>
-<text x="283" y="20">Apr</text>
 <rect x="282.5" y="72.5" width="11" height="11" rx="2.6" fill="#272937"/>
 <rect x="282.5" y="86.5" width="11" height="11" rx="2.6" fill="#272937"/>
 <rect x="282.5" y="100.5" width="11" height="11" rx="2.6" fill="#272937"/>
@@ -182,7 +183,6 @@
 <rect x="338.5" y="58.5" width="11" height="11" rx="2.6" fill="#272937"/>
 <rect x="338.5" y="72.5" width="11" height="11" rx="2.6" fill="#272937"/>
 <rect x="338.5" y="86.5" width="11" height="11" rx="2.6" fill="#272937"/>
-<text x="339" y="20">May</text>
 <rect x="338.5" y="100.5" width="11" height="11" rx="2.6" fill="#272937"/>
 <rect x="338.5" y="114.5" width="11" height="11" rx="2.6" fill="#272937"/>
 <rect x="352.5" y="30.5" width="11" height="11" rx="2.6" fill="#272937"/>
@@ -214,7 +214,6 @@
 <rect x="394.5" y="100.5" width="11" height="11" rx="2.6" fill="#272937"/>
 <rect x="394.5" y="114.5" width="11" height="11" rx="2.6" fill="#272937"/>
 <rect x="408.5" y="30.5" width="11" height="11" rx="2.6" fill="#272937"/>
-<text x="409" y="20">Jun</text>
 <rect x="408.5" y="44.5" width="11" height="11" rx="2.6" fill="#272937"/>
 <rect x="408.5" y="58.5" width="11" height="11" rx="2.6" fill="#272937"/>
 <rect x="408.5" y="72.5" width="11" height="11" rx="2.6" fill="#272937"/>
@@ -245,7 +244,6 @@
 <rect x="464.5" y="30.5" width="11" height="11" rx="2.6" fill="#272937"/>
 <rect x="464.5" y="44.5" width="11" height="11" rx="2.6" fill="#272937"/>
 <rect x="464.5" y="58.5" width="11" height="11" rx="2.6" fill="#272937"/>
-<text x="465" y="20">Jul</text>
 <rect x="464.5" y="72.5" width="11" height="11" rx="2.6" fill="#272937"/>
 <rect x="464.5" y="86.5" width="11" height="11" rx="2.6" fill="#272937"/>
 <rect x="464.5" y="100.5" width="11" height="11" rx="2.6" fill="#272937"/>
@@ -277,7 +275,6 @@
 <rect x="520.5" y="72.5" width="11" height="11" rx="2.6" fill="#272937"/>
 <rect x="520.5" y="86.5" width="11" height="11" rx="2.6" fill="#272937"/>
 <rect x="520.5" y="100.5" width="11" height="11" rx="2.6" fill="#272937"/>
-<text x="521" y="20">Aug</text>
 <rect x="520.5" y="114.5" width="11" height="11" rx="2.6" fill="#272937"/>
 <rect x="534.5" y="30.5" width="11" height="11" rx="2.6" fill="#272937"/>
 <rect x="534.5" y="44.5" width="11" height="11" rx="2.6" fill="#272937"/>
@@ -309,7 +306,6 @@
 <rect x="576.5" y="114.5" width="11" height="11" rx="2.6" fill="#272937"/>
 <rect x="590.5" y="30.5" width="11" height="11" rx="2.6" fill="#272937"/>
 <rect x="590.5" y="44.5" width="11" height="11" rx="2.6" fill="#272937"/>
-<text x="591" y="20">Sep</text>
 <rect x="590.5" y="58.5" width="11" height="11" rx="2.6" fill="#272937"/>
 <rect x="590.5" y="72.5" width="11" height="11" rx="2.6" fill="#272937"/>
 <rect x="590.5" y="86.5" width="11" height="11" rx="2.6" fill="#272937"/>
@@ -340,7 +336,6 @@
 <rect x="646.5" y="44.5" width="11" height="11" rx="2.6" fill="#272937"/>
 <rect x="646.5" y="58.5" width="11" height="11" rx="2.6" fill="#272937"/>
 <rect x="646.5" y="72.5" width="11" height="11" rx="2.6" fill="#272937"/>
-<text x="647" y="20">Oct</text>
 <rect x="646.5" y="86.5" width="11" height="11" rx="2.6" fill="#272937"/>
 <rect x="646.5" y="100.5" width="11" height="11" rx="2.6" fill="#272937"/>
 <rect x="646.5" y="114.5" width="11" height="11" rx="2.6" fill="#272937"/>
@@ -372,7 +367,6 @@
 <rect x="702.5" y="86.5" width="11" height="11" rx="2.6" fill="#272937"/>
 <rect x="702.5" y="100.5" width="11" height="11" rx="2.6" fill="#272937"/>
 <rect x="702.5" y="114.5" width="11" height="11" rx="2.6" fill="#272937"/>
-<text x="717" y="20">Nov</text>
 <rect x="716.5" y="30.5" width="11" height="11" rx="2.6" fill="#272937"/>
 <rect x="716.5" y="44.5" width="11" height="11" rx="2.6" fill="#272937"/>
 <rect x="716.5" y="58.5" width="11" height="11" rx="2.6" fill="#272937"/>

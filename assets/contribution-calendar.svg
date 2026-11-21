@@ -1,15 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="772" height="155" viewBox="0 0 772 155" role="img" aria-labelledby="title description">
 <title id="title">Contribution snake</title>
-<desc id="description">Public GitHub contributions from 2025-11-22 to 2026-11-21. The snake eats gold cells on successful deployment days. 0 deploy days.</desc>
+<desc id="description">Public GitHub contributions from 2025-11-22 to 2026-11-21.</desc>
 <style>text { font: 11px system-ui, sans-serif; fill: #c4c4d1; }</style>
 <rect x="0.5" y="0.5" width="771" height="154" rx="12" fill="#141622" stroke="#313347"/>
-<defs>
-  <g id="food">
-    <rect x="-5.5" y="-5.5" width="11" height="11" rx="2.6" fill="#ffd080"/>
-    <path d="M0 -3 3 0 0 3 -3 0Z" fill="#795121"/>
-  </g>
-  
-</defs>
 <text x="17" y="20">Nov</text>
 <text x="45" y="20">Dec</text>
 <text x="101" y="20">Jan</text>
@@ -391,6 +384,4 @@
 <path d="M16 128H756" stroke="#303244"/>
 <rect x="16" y="137" width="9" height="9" rx="2" fill="#6eb698"/>
 <text x="31" y="145">Contributions</text>
-<use href="#food" x="132" y="141.5"/>
-<text x="144" y="145">0 deploy days</text>
 </svg>

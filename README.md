@@ -51,10 +51,10 @@ I’m exploring how locally run language models fit into apps and bots, especial
 
 <picture>
   <source media="(prefers-reduced-motion: reduce)" srcset="./assets/contribution-calendar.svg">
-  <img src="./assets/contribution-snake.svg" alt="GitHub contribution calendar for the last year. Gold cells mark successful public GitHub deployment days." width="100%">
+  <img src="./assets/contribution-snake.svg" alt="GitHub contributions over the last year, with a green snake that eats randomly placed green squares." width="100%">
 </picture>
 
-Gold squares mark successful public GitHub deployments. The snake eats them as it passes.
+The snake grows as it eats the bright green squares. A new route is generated daily.
 
 ## Friday deploy
 

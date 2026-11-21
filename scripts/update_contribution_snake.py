@@ -4,6 +4,7 @@
 import argparse
 import calendar
 import random
+import re
 from collections import deque
 from datetime import date, datetime, timedelta, timezone
 from html.parser import HTMLParser
@@ -25,18 +26,43 @@ class ContributionCalendar(HTMLParser):
     def __init__(self):
         super().__init__()
         self.days = {}
+        self.counts = {}
+        self.active_ids = {}
+        self.tooltip_day = None
+        self.tooltip_text = []
 
     def handle_starttag(self, tag, attrs):
         if tag == "td":
             attributes = dict(attrs)
             if "data-date" in attributes and "data-level" in attributes:
-                self.days[date.fromisoformat(attributes["data-date"])] = int(attributes["data-level"])
+                day = date.fromisoformat(attributes["data-date"])
+                level = int(attributes["data-level"])
+                self.days[day] = level
+                if level and "id" in attributes:
+                    self.active_ids[attributes["id"]] = day
+        elif tag == "tool-tip":
+            self.tooltip_day = self.active_ids.get(dict(attrs).get("for"))
+            self.tooltip_text = []
+
+    def handle_data(self, data):
+        if self.tooltip_day is not None:
+            self.tooltip_text.append(data)
+
+    def handle_endtag(self, tag):
+        if tag == "tool-tip" and self.tooltip_day is not None:
+            label = "".join(self.tooltip_text).strip()
+            match = re.match(r"([0-9,]+) contributions?\b", label)
+            if match:
+                self.counts[self.tooltip_day] = int(match[1].replace(",", ""))
+            self.tooltip_day = None
 
 
 def contribution_days(owner):
     parser = ContributionCalendar()
     url = f"https://github.com/users/{quote(owner, safe='')}/contributions"
-    request = Request(url, headers={"Accept": "text/html", "User-Agent": "Merunex-profile-calendar"})
+    request = Request(url, headers={
+        "Accept": "text/html", "Accept-Language": "en-US", "User-Agent": "Merunex-profile-calendar",
+    })
     with urlopen(request, timeout=20) as response:
         parser.feed(response.read().decode("utf-8"))
 
@@ -47,7 +73,9 @@ def contribution_days(owner):
     days = {day: level for day, level in sorted(parser.days.items()) if day >= cutoff}
     if len(days) != 365 or any(not 0 <= level < len(COLORS) for level in days.values()):
         raise ValueError("GitHub returned an incomplete or invalid contribution calendar")
-    return days
+    active = {day for day, level in days.items() if level}
+    total = sum(parser.counts[day] for day in active) if active <= parser.counts.keys() else None
+    return days, total
 
 
 def neighbors(cell, directions=DIRECTIONS):
@@ -55,8 +83,8 @@ def neighbors(cell, directions=DIRECTIONS):
     return ((x + dx, y + dy) for dx, dy in directions)
 
 
-def meal_path(cells, body, rng):
-    """Pick a reachable food tile and vary how equally short paths are explored."""
+def meal_path(cells, targets, body, rng):
+    """Pick a reachable contribution day, favoring nearby days with some variation."""
     directions = list(DIRECTIONS)
     rng.shuffle(directions)
     head = body[0]
@@ -64,21 +92,16 @@ def meal_path(cells, body, rng):
     queue = deque([head])
     previous = {head: None}
     depths = {head: 0}
-    candidates = []
     while queue:
         cell = queue.popleft()
-        depth = depths[cell]
-        if depth >= 5:
-            candidates.append(cell)
-        if depth == 17:
-            continue
         for neighbor in neighbors(cell, directions):
             if neighbor in open_cells and neighbor not in previous:
                 queue.append(neighbor)
                 previous[neighbor] = cell
-                depths[neighbor] = depth + 1
+                depths[neighbor] = depths[cell] + 1
 
-    rng.shuffle(candidates)
+    candidates = [cell for cell in previous if cell in targets and cell != head]
+    candidates.sort(key=lambda cell: depths[cell] + rng.uniform(0, 10))
     for food in candidates:
         path = []
         cell = food
@@ -87,23 +110,37 @@ def meal_path(cells, body, rng):
             cell = previous[cell]
         size = min(len(body) + 1, len(SNAKE_COLORS))
         landing_body = (tuple(path) + body)[:size]
-        if sum(cell in cells and cell not in landing_body for cell in neighbors(food)) >= 2:
+        if len(targets) == 1 or any(cell in cells and cell not in landing_body for cell in neighbors(food)):
             return list(reversed(path))
     return []
 
 
-def play_snake(cells, seed):
+def play_snake(cells, activity, seed):
     rng = random.Random(seed)
+    remaining = set(activity)
     starts = [cell for cell in sorted(cells) if all((cell[0] - i, cell[1]) in cells for i in range(4))]
-    x, y = rng.choice(starts)
+    nearby = [
+        (x, y) for x, y in starts
+        if any(3 <= abs(x - tx) + abs(y - ty) <= 7 for tx, ty in remaining)
+    ]
+    x, y = rng.choice(nearby or starts)
     body = tuple((x - i, y) for i in range(4))
     frames = [body]
     meals = []
-    for _ in range(MEALS_PER_LOOP):
-        path = meal_path(cells, body, rng)
+    idle = 0
+    while remaining and len(meals) < MEALS_PER_LOOP:
+        path = meal_path(cells, remaining, body, rng)
         if not path:
-            break
-        spawn = len(frames) - 1 + (rng.randint(1, 3) if meals else 0)
+            moves = [cell for cell in neighbors(body[0]) if cell in cells and cell not in body[:-1]]
+            if not moves or idle >= len(SNAKE_COLORS):
+                break
+            body = (rng.choice(moves),) + body[:-1]
+            frames.append(body)
+            idle += 1
+            continue
+        idle = 0
+        gap = rng.randint(1, min(3, len(path) - 1)) if meals and len(path) > 1 else 0
+        spawn = len(frames) - 1 + gap
         for step, cell in enumerate(path, start=1):
             size = len(body)
             if step == len(path) and size < len(SNAKE_COLORS):
@@ -111,6 +148,7 @@ def play_snake(cells, seed):
             body = (cell,) + body[:size - 1]
             frames.append(body)
         meals.append((path[-1], spawn, len(frames) - 1))
+        remaining.remove(path[-1])
     return frames, meals
 
 
@@ -141,13 +179,16 @@ def draw_calendar(days, seed=None):
         x, y = center(grid[day])
         parts.append(f'<rect x="{x - 5.5}" y="{y - 5.5}" width="11" height="11" rx="2.6" fill="{COLORS[level]}"/>')
 
-    if seed is not None:
-        frames, meals = play_snake(set(grid.values()), seed)
-        parts.extend(draw_game(frames, meals))
+    has_game = seed is not None and any(days.values())
+    if has_game:
+        activity = {grid[day] for day, level in days.items() if level}
+        frames, meals = play_snake(set(grid.values()), activity, seed)
+        if meals:
+            parts.extend(draw_game(frames, meals))
     parts.append(f'''<path d="M16 128H{width - 16}" stroke="#303244"/>
 <rect x="16" y="137" width="9" height="9" rx="2" fill="{COLORS[3]}"/>
 <text x="31" y="145">Contributions</text>''')
-    if seed is not None:
+    if has_game:
         parts.append(f'''<rect x="132" y="137" width="9" height="9" fill="{FOOD_COLOR}"/>
 <text x="147" y="145">Snake food</text>''')
     parts.append("</svg>")
@@ -196,16 +237,35 @@ def draw_game(frames, meals):
     return parts
 
 
+def update_readme(path, active_days, total):
+    start = "<!-- contribution-summary:start -->"
+    end = "<!-- contribution-summary:end -->"
+    before, start_marker, tail = path.read_text(encoding="utf-8").partition(start)
+    _, end_marker, after = tail.partition(end)
+    if not start_marker or not end_marker:
+        raise ValueError("The contribution summary markers are missing from README.md")
+    days = f"{active_days:,} active {'day' if active_days == 1 else 'days'}"
+    if total is None:
+        summary = days
+    else:
+        contributions = f"{total:,} {'contribution' if total == 1 else 'contributions'}"
+        summary = f"{contributions} across {days}"
+    path.write_text(f"{before}{start}\n**{summary}** in the last 365 days.\n{end}{after}", encoding="utf-8")
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("owner")
     args = parser.parse_args()
-    days = contribution_days(args.owner)
-    assets = Path(__file__).resolve().parents[1] / "assets"
+    days, total = contribution_days(args.owner)
+    root = Path(__file__).resolve().parents[1]
+    assets = root / "assets"
     seed = f"{args.owner}:{max(days)}"
     (assets / "contribution-snake.svg").write_text(draw_calendar(days, seed), encoding="utf-8")
     (assets / "contribution-calendar.svg").write_text(draw_calendar(days), encoding="utf-8")
-    print(f"Rendered {len(days)} public calendar days with a new Snake game for {max(days)}")
+    active = sum(level > 0 for level in days.values())
+    update_readme(root / "README.md", active, total)
+    print(f"Rendered {len(days)} public calendar days, including {active} active days")
 
 
 if __name__ == "__main__":

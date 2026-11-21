@@ -6,20 +6,35 @@ import calendar
 import random
 import re
 from collections import deque
+from dataclasses import dataclass
 from datetime import date, datetime, timedelta, timezone
 from html.parser import HTMLParser
 from pathlib import Path
+from typing import Optional
 from urllib.parse import quote
 from urllib.request import Request, urlopen
 
 
 COLORS = ("#272937", "#31594d", "#438571", "#6eb698", "#a4efc7")
 FOOD_COLOR = "#beff68"
-SNAKE_COLORS = ("#83ef89", "#5bdd72", "#50cf67", "#48bf60", "#43af59", "#3b9f54", "#348e4b", "#307f44")
+ACTIVITY_COLOR = "#8ee8c8"
+BODY_COLOR = "#48bd65"
+HEAD_COLOR = "#a5f497"
 PITCH = 14
-STEP_SECONDS = 0.14
-MEALS_PER_LOOP = 30
+STEP_SECONDS = 0.1
+RESULT_PAUSE = 16
 DIRECTIONS = ((1, 0), (0, 1), (-1, 0), (0, -1))
+Cell = tuple[int, int]
+
+
+@dataclass
+class SnakeRound:
+    heads: list[Cell]
+    start_neck: Cell
+    body_events: dict[Cell, list[tuple[int, int]]]
+    food_events: list[tuple[int, Optional[Cell]]]
+    activity_bites: dict[Cell, int]
+    won: bool
 
 
 class ContributionCalendar(HTMLParser):
@@ -78,78 +93,120 @@ def contribution_days(owner):
     return days, total
 
 
-def neighbors(cell, directions=DIRECTIONS):
-    x, y = cell
-    return ((x + dx, y + dy) for dx, dy in directions)
+def board_cycle(weeks, mirror, rng):
+    """Join the square circuits along a random spanning tree to visit the whole board."""
+    links = {}
+
+    def connect_path(*cells):
+        for first, second in zip(cells, cells[1:]):
+            links.setdefault(first, set()).add(second)
+            links.setdefault(second, set()).add(first)
+
+    def disconnect(first, second):
+        links[first].remove(second)
+        links[second].remove(first)
+
+    blocks = {(col, row) for col in range(weeks // 2) for row in range(3)}
+    for col, row in blocks:
+        x, y = 1 + 2 * col, 1 + 2 * row
+        connect_path((x, y), (x + 1, y), (x + 1, y + 1), (x, y + 1), (x, y))
+
+    pending = [(0, 0)]
+    blocks.remove((0, 0))
+    while pending:
+        col, row = pending.pop()
+        x, y = 1 + 2 * col, 1 + 2 * row
+        for dx, dy in rng.sample(DIRECTIONS, len(DIRECTIONS)):
+            neighbor = col + dx, row + dy
+            if neighbor not in blocks:
+                continue
+            blocks.remove(neighbor)
+            pending.append(neighbor)
+            if dx:
+                edge_x = x + int(dx > 0)
+                first, second = (edge_x, y), (edge_x, y + 1)
+            else:
+                edge_y = y + int(dy > 0)
+                first, second = (x, edge_y), (x + 1, edge_y)
+            across_first = first[0] + dx, first[1] + dy
+            across_second = second[0] + dx, second[1] + dy
+            disconnect(first, second)
+            disconnect(across_first, across_second)
+            connect_path(first, across_first)
+            connect_path(second, across_second)
+
+    # The top and left borders add two cells at a time, keeping the corner open.
+    for x in range(1, weeks, 2):
+        disconnect((x, 1), (x + 1, 1))
+        connect_path((x, 1), (x, 0), (x + 1, 0), (x + 1, 1))
+    for y in range(1, 7, 2):
+        disconnect((1, y), (1, y + 1))
+        connect_path((1, y), (0, y), (0, y + 1), (1, y + 1))
+
+    start = (1, 0)
+    previous, current = None, start
+    cycle = []
+    for _ in range(len(links)):
+        cycle.append(current)
+        previous, current = current, min(links[current] - {previous})
+    if current != start or len(set(cycle)) != len(links):
+        raise ValueError("The snake route must visit each board cell exactly once")
+    if mirror:
+        cycle = [(weeks - 1 - x, 6 - y) for x, y in cycle]
+    if rng.choice((False, True)):
+        cycle.reverse()
+    return cycle
 
 
-def meal_path(cells, targets, body, rng):
-    """Pick a reachable contribution day, favoring nearby days with some variation."""
-    directions = list(DIRECTIONS)
-    rng.shuffle(directions)
-    head = body[0]
-    open_cells = cells.difference(body)
-    queue = deque([head])
-    previous = {head: None}
-    depths = {head: 0}
-    while queue:
-        cell = queue.popleft()
-        for neighbor in neighbors(cell, directions):
-            if neighbor in open_cells and neighbor not in previous:
-                queue.append(neighbor)
-                previous[neighbor] = cell
-                depths[neighbor] = depths[cell] + 1
-
-    candidates = [cell for cell in previous if cell in targets and cell != head]
-    candidates.sort(key=lambda cell: depths[cell] + rng.uniform(0, 10))
-    for food in candidates:
-        path = []
-        cell = food
-        while cell != head:
-            path.append(cell)
-            cell = previous[cell]
-        size = min(len(body) + 1, len(SNAKE_COLORS))
-        landing_body = (tuple(path) + body)[:size]
-        if len(targets) == 1 or any(cell in cells and cell not in landing_body for cell in neighbors(food)):
-            return list(reversed(path))
-    return []
-
-
-def play_snake(cells, activity, seed):
+def play_snake(weeks, mirror, activity, seed):
     rng = random.Random(seed)
-    remaining = set(activity)
-    starts = [cell for cell in sorted(cells) if all((cell[0] - i, cell[1]) in cells for i in range(4))]
-    nearby = [
-        (x, y) for x, y in starts
-        if any(3 <= abs(x - tx) + abs(y - ty) <= 7 for tx, ty in remaining)
+    cycle = board_cycle(weeks, mirror, rng)
+    capacity = len(cycle)
+    clear_starts = [
+        index for index in range(capacity)
+        if all(cycle[(index + offset) % capacity] not in activity for offset in range(-3, 1))
     ]
-    x, y = rng.choice(nearby or starts)
-    body = tuple((x - i, y) for i in range(4))
-    frames = [body]
-    meals = []
-    idle = 0
-    while remaining and len(meals) < MEALS_PER_LOOP:
-        path = meal_path(cells, remaining, body, rng)
-        if not path:
-            moves = [cell for cell in neighbors(body[0]) if cell in cells and cell not in body[:-1]]
-            if not moves or idle >= len(SNAKE_COLORS):
-                break
-            body = (rng.choice(moves),) + body[:-1]
-            frames.append(body)
-            idle += 1
-            continue
-        idle = 0
-        gap = rng.randint(1, min(3, len(path) - 1)) if meals and len(path) > 1 else 0
-        spawn = len(frames) - 1 + gap
-        for step, cell in enumerate(path, start=1):
-            size = len(body)
-            if step == len(path) and size < len(SNAKE_COLORS):
-                size += 1
-            body = (cell,) + body[:size - 1]
-            frames.append(body)
-        meals.append((path[-1], spawn, len(frames) - 1))
-        remaining.remove(path[-1])
-    return frames, meals
+    position = rng.choice(clear_starts or range(capacity))
+    body = deque(cycle[(position + offset) % capacity] for offset in range(-3, 1))
+    occupied = set(body)
+    remaining = activity - occupied
+    activity_bites = dict.fromkeys(activity & occupied, 0)
+    body_events = {cell: [(0, int(cell in occupied))] for cell in cycle}
+    heads, start_neck = [body[-1]], body[-2]
+
+    def choose_food():
+        # Pick only from free cells ahead so every round can reach full length.
+        max_distance = min(3, capacity - len(body))
+        choices = [cycle[(position + step) % capacity] for step in range(1, max_distance + 1)]
+        choices = [cell for cell in choices if cell not in remaining]
+        return rng.choice(choices) if choices else None
+
+    food = choose_food()
+    food_events = [(0, food)]
+    while len(body) < capacity:
+        position = (position + 1) % capacity
+        target = cycle[position]
+        if target in occupied:
+            break
+        frame = len(heads)
+        heads.append(target)
+        if target in remaining:
+            remaining.remove(target)
+            activity_bites[target] = frame
+        elif target != food:
+            tail = body.popleft()
+            occupied.remove(tail)
+            body_events[tail].append((frame, 0))
+        body.append(target)
+        occupied.add(target)
+        body_events[target].append((frame, 1))
+        if target == food or food is None:
+            next_food = choose_food()
+            if next_food != food:
+                food_events.append((frame, next_food))
+            food = next_food
+
+    return SnakeRound(heads, start_neck, body_events, food_events, activity_bites, len(body) == capacity)
 
 
 def center(cell):
@@ -161,6 +218,7 @@ def draw_calendar(days, seed=None):
     first_day, last_day = min(days), max(days)
     sunday = first_day - timedelta(days=(first_day.weekday() + 1) % 7)
     grid = {day: divmod((day - sunday).days, 7) for day in days}
+    weeks = grid[last_day][0] + 1
     width = center(grid[last_day])[0] + 22
     parts = [f'''<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="155" viewBox="0 0 {width} 155" role="img" aria-labelledby="title description">
 <title id="title">Contribution snake</title>
@@ -179,61 +237,99 @@ def draw_calendar(days, seed=None):
         x, y = center(grid[day])
         parts.append(f'<rect x="{x - 5.5}" y="{y - 5.5}" width="11" height="11" rx="2.6" fill="{COLORS[level]}"/>')
 
-    has_game = seed is not None and any(days.values())
-    if has_game:
+    if seed is not None:
+        date_cells = set(grid.values())
         activity = {grid[day] for day, level in days.items() if level}
-        frames, meals = play_snake(set(grid.values()), activity, seed)
-        if meals:
-            parts.extend(draw_game(frames, meals))
+        game = play_snake(weeks, (0, 0) in date_cells, activity, seed)
+        for cell in sorted(game.body_events.keys() - date_cells):
+            x, y = center(cell)
+            parts.append(f'<rect x="{x - 5.5}" y="{y - 5.5}" width="11" height="11" rx="2.6" fill="#1d1f2c"/>')
+        parts.extend(draw_game(game, activity, width))
     parts.append(f'''<path d="M16 128H{width - 16}" stroke="#303244"/>
 <rect x="16" y="137" width="9" height="9" rx="2" fill="{COLORS[3]}"/>
 <text x="31" y="145">Contributions</text>''')
-    if has_game:
+    if seed is not None:
         parts.append(f'''<rect x="132" y="137" width="9" height="9" fill="{FOOD_COLOR}"/>
 <text x="147" y="145">Snake food</text>''')
     parts.append("</svg>")
     return "\n".join(parts) + "\n"
 
 
-def draw_game(frames, meals):
-    duration = len(frames) * STEP_SECONDS
+def draw_game(game, activity, width):
+    end_frame = len(game.heads) - 1
+    frames = len(game.heads) + RESULT_PAUSE
+    duration = frames * STEP_SECONDS
     timing = f'calcMode="discrete" dur="{duration:.3f}s" repeatCount="indefinite"'
-    parts = []
 
-    for cell, spawn, bite in meals:
+    def timeline(events):
+        events = [*events, (frames, events[-1][1])]
+        keys = ";".join(f"{at / frames:.6f}" for at, _ in events)
+        values = ";".join(str(value) for _, value in events)
+        return f'keyTimes="{keys}" values="{values}" {timing}'
+
+    def opacity(events):
+        if len(events) < 2:
+            return ""
+        return f'<animate attributeName="opacity" {timeline(events)}/>'
+
+    def translation(events):
+        positions = []
+        for frame, cell in events:
+            x, y = center(cell)
+            positions.append((frame, f"{x} {y}"))
+        return f'<animateTransform attributeName="transform" type="translate" {timeline(positions)}/>'
+
+    parts = ['<g class="activity-food">']
+    for cell in sorted(activity):
+        bite = game.activity_bites.get(cell)
+        if bite == 0:
+            continue
         x, y = center(cell)
-        if spawn == 0:
-            keys, values = f"0;{bite / len(frames):.6f};1", "1;0;0"
-        else:
-            keys = f"0;{spawn / len(frames):.6f};{bite / len(frames):.6f};1"
-            values = "0;1;0;0"
-        parts.append(f'''<g class="food" transform="translate({x} {y})" opacity="0">
+        marker = opacity([(0, 1), (bite, 0)]) if bite is not None else ""
+        parts.append(f'<rect x="{x - 2}" y="{y - 2}" width="4" height="4" fill="{ACTIVITY_COLOR}">{marker}</rect>')
+    parts.append("</g>")
+
+    snacks = [(frame, cell) for frame, cell in game.food_events if cell is not None]
+    if snacks:
+        snack_positions = [(0, snacks[0][1]), *(event for event in snacks if event[0])]
+        snack_visibility = [(frame, int(cell is not None)) for frame, cell in game.food_events]
+        if snack_visibility[-1][0] != end_frame:
+            snack_visibility.append((end_frame, 0))
+        parts.append(f'''<g class="food" opacity="{snack_visibility[0][1]}">
   <rect x="-5" y="-5" width="10" height="10" fill="{FOOD_COLOR}"/>
   <rect x="-3" y="-3" width="3" height="3" fill="#f2ffd0"/>
-  <animate attributeName="opacity" values="{values}" keyTimes="{keys}" {timing}/>
+  {translation(snack_positions)}
+  {opacity(snack_visibility)}
 </g>''')
-
-    angles = []
-    for head, neck, *_ in frames:
-        direction = (head[0] - neck[0], head[1] - neck[1])
-        angles.append(str(DIRECTIONS.index(direction) * 90))
-    facing = f'<animateTransform attributeName="transform" type="rotate" values="{";".join(angles)}" {timing}/>'
 
     parts.append('<g class="snake">')
-    for index in reversed(range(len(frames[-1]))):
-        cells = (frame[min(index, len(frame) - 1)] for frame in frames)
-        positions = ";".join(f"{x} {y}" for x, y in map(center, cells))
-        parts.append(f'''<g class="{'head' if index == 0 else 'body'}" transform="translate({positions.split(';', 1)[0]})">
-  <rect x="-6" y="-6" width="12" height="12" fill="{SNAKE_COLORS[index]}"/>
-  <animateTransform attributeName="transform" type="translate" values="{positions}" {timing}/>''')
-        if index == 0:
-            parts.append(f'''<g class="eyes">
-  <rect x="1" y="-4" width="2" height="2" fill="#142a1b"/>
-  <rect x="1" y="2" width="2" height="2" fill="#142a1b"/>
-  {facing}
-</g>''')
-        parts.append("</g>")
-    parts.append("</g>")
+    for cell, events in sorted(game.body_events.items()):
+        x, y = center(cell)
+        parts.append(f'''<rect class="body-cell" x="{x - 6}" y="{y - 6}" width="12" height="12"
+  fill="{BODY_COLOR}" opacity="{events[0][1]}">{opacity(events)}</rect>''')
+
+    angles = []
+    neck = game.start_neck
+    for frame, head in enumerate(game.heads):
+        direction = head[0] - neck[0], head[1] - neck[1]
+        angle = DIRECTIONS.index(direction) * 90
+        if not angles or angle != angles[-1][1]:
+            angles.append((frame, angle))
+        neck = head
+    start_x, start_y = center(game.heads[0])
+    result = "Board cleared" if game.won else "Game over"
+    parts.append(f'''<g class="head" transform="translate({start_x} {start_y})">
+  <rect x="-6" y="-6" width="12" height="12" fill="{HEAD_COLOR}"/>
+  {translation(enumerate(game.heads))}
+  <g class="eyes">
+    <rect x="1" y="-4" width="2" height="2" fill="#142a1b"/>
+    <rect x="1" y="2" width="2" height="2" fill="#142a1b"/>
+    <animateTransform attributeName="transform" type="rotate" {timeline(angles)}/>
+  </g>
+</g>
+</g>
+<text class="game-result" x="{width - 17}" y="145" text-anchor="end" opacity="0"
+  style="fill: {HEAD_COLOR}; font-weight: 600">{result}{opacity([(0, 0), (end_frame, 1)])}</text>''')
     return parts
 
 
@@ -261,7 +357,7 @@ def main():
     root = Path(__file__).resolve().parents[1]
     assets = root / "assets"
     seed = f"{args.owner}:{max(days)}"
-    (assets / "contribution-snake.svg").write_text(draw_calendar(days, seed), encoding="utf-8")
+    (assets / "contribution-snake-game.svg").write_text(draw_calendar(days, seed), encoding="utf-8")
     (assets / "contribution-calendar.svg").write_text(draw_calendar(days), encoding="utf-8")
     active = sum(level > 0 for level in days.values())
     update_readme(root / "README.md", active, total)

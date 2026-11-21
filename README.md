@@ -51,14 +51,14 @@ I’m exploring how locally run language models fit into apps and bots, especial
 
 <picture>
   <source media="(prefers-reduced-motion: reduce)" srcset="./assets/contribution-calendar.svg">
-  <img src="./assets/contribution-snake.svg" alt="GitHub contributions over the last year, with a green snake that eats squares on active days." width="100%">
+  <img src="./assets/contribution-snake-game.svg" alt="A Snake game that plays itself on my GitHub contribution calendar." width="100%">
 </picture>
 
 <!-- contribution-summary:start -->
 **55 contributions across 17 active days** in the last 365 days.
 <!-- contribution-summary:end -->
 
-Bright green squares appear on days with GitHub contributions. The order changes daily.
+The snake eats bright green food and the dots on real contribution days. It fills the board and starts another round. The route changes daily.
 
 ## Friday deploy
 

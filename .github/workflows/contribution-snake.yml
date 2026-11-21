@@ -25,7 +25,7 @@ jobs:
         run: python3 scripts/update_contribution_snake.py "$PROFILE_OWNER"
       - name: Publish a changed calendar
         run: |
-          git add assets/contribution-snake.svg assets/contribution-calendar.svg README.md
+          git add assets/contribution-snake-game.svg assets/contribution-calendar.svg README.md
           if git diff --cached --quiet; then
             exit 0
           fi

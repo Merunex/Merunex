@@ -2,7 +2,7 @@
 
 I’m **Daniil**, a full-stack developer. I care about clear architecture, thoughtful database design, and software that’s useful in everyday work.
 
-**[Repositories ↗](https://github.com/Merunex?tab=repositories)** &nbsp;·&nbsp; [Starred projects ↗](https://github.com/Merunex?tab=stars)
+**[Repositories ↗](https://github.com/Merunex?tab=repositories)** &nbsp;·&nbsp; [Starred projects ↗](https://github.com/Merunex?tab=stars) &nbsp;·&nbsp; [Friday deploy ↓](#friday-deploy)
 
 ## What I build
 
@@ -46,3 +46,31 @@ I’m exploring how locally run language models fit into apps and bots, especial
   <img src="./assets/github.svg" width="40" height="40" alt="GitHub">&nbsp;
   <img src="./assets/vscode.svg" width="40" height="40" alt="VS Code">
 </p>
+
+## Friday deploy
+
+<details>
+<summary><strong>It’s Friday, 17:59. The tests are green.</strong></summary>
+
+<details>
+<summary>Deploy now</summary>
+
+```text
+[OK]  Production is up.
+[OK]  Dashboards are green.
+[!]   Slack: “Quick question…”
+```
+
+</details>
+
+<details>
+<summary>Schedule for Monday</summary>
+
+```text
+[OK]  Deploy queued for Monday.
+[OK]  Weekend unlocked.
+[i]   Your laptop can finally nap.
+```
+
+</details>
+</details>

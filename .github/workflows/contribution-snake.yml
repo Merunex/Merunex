@@ -1,0 +1,36 @@
+name: Update contribution snake
+
+on:
+  schedule:
+    - cron: '17 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency: contribution-snake
+
+jobs:
+  render:
+    if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          fetch-depth: 0
+      - name: Render the public contribution calendar
+        env:
+          PROFILE_OWNER: ${{ github.repository_owner }}
+        run: python3 scripts/update_contribution_snake.py "$PROFILE_OWNER"
+      - name: Publish a changed calendar
+        run: |
+          git add assets/contribution-snake.svg
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Refresh contribution snake'
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin "HEAD:$GITHUB_REF_NAME"

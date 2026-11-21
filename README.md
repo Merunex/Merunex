@@ -47,6 +47,12 @@ I’m exploring how locally run language models fit into apps and bots, especial
   <img src="./assets/vscode.svg" width="40" height="40" alt="VS Code">
 </p>
 
+## Contribution snake
+
+<img src="./assets/contribution-snake.svg" alt="Animated GitHub contribution calendar for the last year" width="100%">
+
+Gold squares mark successful public GitHub deployments. The snake eats them as it passes.
+
 ## Friday deploy
 
 <details>

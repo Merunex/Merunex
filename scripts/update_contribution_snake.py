@@ -10,7 +10,6 @@ from dataclasses import dataclass
 from datetime import date, datetime, timedelta, timezone
 from html.parser import HTMLParser
 from pathlib import Path
-from typing import Optional
 from urllib.parse import quote
 from urllib.request import Request, urlopen
 
@@ -21,7 +20,8 @@ ACTIVITY_COLOR = "#8ee8c8"
 BODY_COLOR = "#48bd65"
 HEAD_COLOR = "#a5f497"
 PITCH = 14
-STEP_SECONDS = 0.1
+STEP_SECONDS = 0.12
+FOOD_ON_BOARD = 24
 RESULT_PAUSE = 16
 DIRECTIONS = ((1, 0), (0, 1), (-1, 0), (0, -1))
 Cell = tuple[int, int]
@@ -32,7 +32,7 @@ class SnakeRound:
     heads: list[Cell]
     start_neck: Cell
     body_events: dict[Cell, list[tuple[int, int]]]
-    food_events: list[tuple[int, Optional[Cell]]]
+    food_events: dict[Cell, list[tuple[int, int]]]
     activity_bites: dict[Cell, int]
     won: bool
 
@@ -169,20 +169,26 @@ def play_snake(weeks, mirror, activity, seed):
     position = rng.choice(clear_starts or range(capacity))
     body = deque(cycle[(position + offset) % capacity] for offset in range(-3, 1))
     occupied = set(body)
+    board = set(cycle)
     remaining = activity - occupied
     activity_bites = dict.fromkeys(activity & occupied, 0)
     body_events = {cell: [(0, int(cell in occupied))] for cell in cycle}
     heads, start_neck = [body[-1]], body[-2]
 
-    def choose_food():
-        # Pick only from free cells ahead so every round can reach full length.
-        max_distance = min(3, capacity - len(body))
-        choices = [cycle[(position + step) % capacity] for step in range(1, max_distance + 1)]
-        choices = [cell for cell in choices if cell not in remaining]
-        return rng.choice(choices) if choices else None
+    food = set()
+    food_events = {}
 
-    food = choose_food()
-    food_events = [(0, food)]
+    def refill_food(frame):
+        missing = FOOD_ON_BOARD - len(food)
+        if not missing:
+            return
+        free_cells = sorted(board - occupied - remaining - food)
+        for cell in rng.sample(free_cells, min(missing, len(free_cells))):
+            food.add(cell)
+            events = food_events.setdefault(cell, [(0, 0)] if frame else [])
+            events.append((frame, 1))
+
+    refill_food(0)
     while len(body) < capacity:
         position = (position + 1) % capacity
         target = cycle[position]
@@ -193,18 +199,17 @@ def play_snake(weeks, mirror, activity, seed):
         if target in remaining:
             remaining.remove(target)
             activity_bites[target] = frame
-        elif target != food:
+        elif target in food:
+            food.remove(target)
+            food_events[target].append((frame, 0))
+        else:
             tail = body.popleft()
             occupied.remove(tail)
             body_events[tail].append((frame, 0))
         body.append(target)
         occupied.add(target)
         body_events[target].append((frame, 1))
-        if target == food or food is None:
-            next_food = choose_food()
-            if next_food != food:
-                food_events.append((frame, next_food))
-            food = next_food
+        refill_food(frame)
 
     return SnakeRound(heads, start_neck, body_events, food_events, activity_bites, len(body) == capacity)
 
@@ -289,18 +294,15 @@ def draw_game(game, activity, width):
         parts.append(f'<rect x="{x - 2}" y="{y - 2}" width="4" height="4" fill="{ACTIVITY_COLOR}">{marker}</rect>')
     parts.append("</g>")
 
-    snacks = [(frame, cell) for frame, cell in game.food_events if cell is not None]
-    if snacks:
-        snack_positions = [(0, snacks[0][1]), *(event for event in snacks if event[0])]
-        snack_visibility = [(frame, int(cell is not None)) for frame, cell in game.food_events]
-        if snack_visibility[-1][0] != end_frame:
-            snack_visibility.append((end_frame, 0))
-        parts.append(f'''<g class="food" opacity="{snack_visibility[0][1]}">
+    parts.append(f'''<defs><g id="food-square">
   <rect x="-5" y="-5" width="10" height="10" fill="{FOOD_COLOR}"/>
   <rect x="-3" y="-3" width="3" height="3" fill="#f2ffd0"/>
-  {translation(snack_positions)}
-  {opacity(snack_visibility)}
-</g>''')
+</g></defs>
+<g class="food">''')
+    for cell, events in sorted(game.food_events.items()):
+        x, y = center(cell)
+        parts.append(f'<use href="#food-square" x="{x}" y="{y}" opacity="{events[0][1]}">{opacity(events)}</use>')
+    parts.append("</g>")
 
     parts.append('<g class="snake">')
     for cell, events in sorted(game.body_events.items()):

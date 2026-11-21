@@ -58,7 +58,7 @@ I’m exploring how locally run language models fit into apps and bots, especial
 **56 contributions across 17 active days** in the last 365 days.
 <!-- contribution-summary:end -->
 
-The snake eats bright green food and the dots on real contribution days. It fills the board and starts another round. The route changes daily.
+Bright green food spawns across the board. The snake also eats the dots on real contribution days, fills the board, and starts another round. The route changes daily.
 
 ## Friday deploy
 

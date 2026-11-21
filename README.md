@@ -51,7 +51,7 @@ I’m exploring how locally run language models fit into apps and bots, especial
 
 <picture>
   <source media="(prefers-reduced-motion: reduce)" srcset="./assets/contribution-calendar.svg">
-  <img src="/Merunex/Merunex/raw/HEAD/assets/contribution-snake-game.svg" alt="A Snake game that plays itself on my GitHub contribution calendar." width="100%">
+  <img src="https://github.com/Merunex/Merunex/raw/HEAD/assets/contribution-snake-game.svg" alt="A Snake game that plays itself on my GitHub contribution calendar." width="100%">
 </picture>
 
 <!-- contribution-summary:start -->

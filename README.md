@@ -2,7 +2,7 @@
 
 I’m **Daniil**, a full-stack developer. I care about clear architecture, thoughtful database design, and software that’s useful in everyday work.
 
-**[Repositories ↗](https://github.com/Merunex?tab=repositories)** &nbsp;·&nbsp; [Starred projects ↗](https://github.com/Merunex?tab=stars) &nbsp;·&nbsp; [Friday deploy ↓](#friday-deploy)
+**[Repositories&nbsp;↗](https://github.com/Merunex?tab=repositories)** · [Stars&nbsp;↗](https://github.com/Merunex?tab=stars) · [Friday&nbsp;deploy&nbsp;↓](#friday-deploy)
 
 ## What I build
 

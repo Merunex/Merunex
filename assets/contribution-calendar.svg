@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="772" height="155" viewBox="0 0 772 155" role="img" aria-labelledby="title description">
 <title id="title">Contribution snake</title>
-<desc id="description">Public GitHub contributions from 2025-11-27 to 2026-11-26.</desc>
+<desc id="description">Public GitHub contributions from 2025-11-28 to 2026-11-27.</desc>
 <style>text { font: 11px system-ui, sans-serif; fill: #c4c4d1; }</style>
 <rect x="0.5" y="0.5" width="771" height="154" rx="12" fill="#141622" stroke="#313347"/>
 <text x="31" y="20">Dec</text>
@@ -15,7 +15,6 @@
 <text x="577" y="20">Sep</text>
 <text x="633" y="20">Oct</text>
 <text x="703" y="20">Nov</text>
-<rect x="16.5" y="86.5" width="11" height="11" rx="2.6" fill="#272937"/>
 <rect x="16.5" y="100.5" width="11" height="11" rx="2.6" fill="#272937"/>
 <rect x="16.5" y="114.5" width="11" height="11" rx="2.6" fill="#272937"/>
 <rect x="30.5" y="30.5" width="11" height="11" rx="2.6" fill="#272937"/>
@@ -380,6 +379,7 @@
 <rect x="744.5" y="58.5" width="11" height="11" rx="2.6" fill="#31594d"/>
 <rect x="744.5" y="72.5" width="11" height="11" rx="2.6" fill="#31594d"/>
 <rect x="744.5" y="86.5" width="11" height="11" rx="2.6" fill="#31594d"/>
+<rect x="744.5" y="100.5" width="11" height="11" rx="2.6" fill="#31594d"/>
 <path d="M16 128H756" stroke="#303244"/>
 <rect x="16" y="137" width="9" height="9" rx="2" fill="#6eb698"/>
 <text x="31" y="145">Contributions</text>
